@@ -7,37 +7,11 @@ class ATMMachine{
     private static final String user = "prince";
     private static final String password = "Prince@123";
 
-    public static void menu(){
-        Scanner sc = new Scanner(System.in);
-        System.out.println("\n\n1.Check Balance");
-        System.out.println("2.Deposit");
-        System.out.println("3.Withraw");
-
-        System.out.print("\nEnter your choice: ");
-        int choice = sc.nextInt();
-
-        switch(choice){
-            case 1:
-                CheckBlance();
-                break;
-            case 2:
-                Deposit();
-                break;
-            case 3:
-                Withraw();
-            default:
-                System.out.println("Invalid Option try again......???");
-                System.exit(0);
-                break;    
-        }
-        
-    }
-
-  public static void CheckBlance(){
+  public static float CheckBlance(int acc){
            Connection conn = null;
             PreparedStatement pstmt = null;
             ResultSet rs = null;
-
+            float balance=0;
 
              try {
             
@@ -45,25 +19,77 @@ class ATMMachine{
 
             String sql = "SELECT balance FROM user WHERE account_no = ?";
             pstmt = conn.prepareStatement(sql);
-            pstmt.setInt(1, 10003);
+            pstmt.setInt(1, acc);
 
             rs = pstmt.executeQuery();
 
             if (rs.next()) {
-                float balance = rs.getFloat("balance");
-                System.out.println("Current Balance: " + balance);
+                balance = rs.getFloat("balance");
+                return balance;
             } 
+        }catch (SQLException e) {
+            System.out.println(e);
+        }
+        return balance;
+
+  }
+
+  public static void Deposit(int acc){
+
+         Connection conn = null; 
+
+         Scanner sc = new Scanner(System.in);
+
+            System.out.println("\nEnter amount: ");
+            float amount = sc.nextFloat();
+
+             try {
+            conn = DriverManager.getConnection(url, user, password);
+
+            String sql = "UPDATE user set balance= balance + ?  WHERE account_no = ?";
+                       
+           PreparedStatement debitStatement = conn.prepareStatement(sql);
+           debitStatement.setFloat(1,amount);
+           debitStatement.setInt(2,acc);
+           debitStatement.executeUpdate();
+           System.out.println("Deposit successfull...!");
+            System.out.println("Current Balance: " + CheckBlance(acc));
+
         }catch (SQLException e) {
             System.out.println(e);
         }
 
   }
 
-  public static void Deposit(){
+  public static void Withraw(int acc){
 
-  }
+         Connection conn = null; 
+         Scanner sc = new Scanner(System.in);
 
-  public static void Withraw(){
+            System.out.println("\nEnter amount: ");
+            float amount = sc.nextFloat();
+
+            float test = CheckBlance(acc);
+            if(amount>test){
+                System.out.println("Insufficient balance...!");
+                System.exit(0);
+            }
+
+             try {
+            conn = DriverManager.getConnection(url, user, password);
+
+            String sql = "UPDATE user set balance= balance - ?  WHERE account_no = ?";
+                       
+           PreparedStatement creditStatement = conn.prepareStatement(sql);
+           creditStatement.setFloat(1,amount);
+           creditStatement.setInt(2,acc);
+           creditStatement.executeUpdate();
+           System.out.println("Deposit successfull...!");
+            System.out.println("Current Balance: " + CheckBlance(acc));
+
+        }catch (SQLException e) {
+            System.out.println(e);
+        }
 
   }
 
@@ -94,9 +120,30 @@ class ATMMachine{
                 String name = rs.getString("name");
                 if(pin == atmPin){
                      System.out.println("\nHelo " + name);
-                     menu();
-                }
-                else{
+                System.out.println("\n\n1.Check Balance");
+                System.out.println("2.Deposit");
+                System.out.println("3.Withraw");
+
+                System.out.print("\nEnter your choice: ");
+                int choice = sc.nextInt();
+
+                switch(choice){
+                    case 1:
+                        float amount = CheckBlance(acc);
+                        System.out.println("Current balance: " + amount);
+                        break;
+                    case 2:
+                        Deposit(acc);
+                        break;
+                    case 3:
+                        Withraw(acc);
+                    default:
+                        System.out.println("Invalid Option try again......???");
+                        System.exit(0);
+                        break;    
+                     }
+        
+                }else{
                      System.out.println("Wrong Pin..?");
                 }
 
