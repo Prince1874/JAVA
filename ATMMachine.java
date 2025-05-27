@@ -58,6 +58,7 @@ class ATMMachine{
         }catch (SQLException e) {
             System.out.println(e);
         }
+        sc.close();
 
   }
 
@@ -90,6 +91,7 @@ class ATMMachine{
         }catch (SQLException e) {
             System.out.println(e);
         }
+        sc.close();
 
   }
 
@@ -137,6 +139,7 @@ class ATMMachine{
                         break;
                     case 3:
                         Withraw(acc);
+                        break;
                     default:
                         System.out.println("Invalid Option try again......???");
                         System.exit(0);
@@ -151,5 +154,7 @@ class ATMMachine{
         }catch (SQLException e) {
             System.out.println(e);
         }
+        sc.close();
+
 }  
 }
